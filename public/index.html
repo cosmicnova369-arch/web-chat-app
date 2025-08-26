@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Chat App</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Username modal -->
+    <div id="usernameModal" class="modal">
+        <div class="modal-content">
+            <h2>💬 Welcome to Private Chat!</h2>
+            <div id="roomInfo" class="room-info hidden">
+                <p>Room Link: <span class="room-link" id="roomLink"></span>
+                <button class="copy-btn" id="copyLinkBtn">Copy</button></p>
+                <small>Share this link with your girlfriend to chat privately!</small>
+            </div>
+            <p>Please enter your username to start chatting:</p>
+            <input type="text" id="usernameInput" placeholder="Enter your username" maxlength="20">
+            <button id="joinBtn">Join Chat</button>
+        </div>
+    </div>
+
+    <!-- Main chat interface -->
+    <div id="chatContainer" class="chat-container hidden">
+        <div class="chat-header">
+            <h1>🚀 Web Chat App</h1>
+            <div class="user-info">
+                <span id="currentUser"></span>
+                <button id="leaveBtn" class="leave-btn">Leave Chat</button>
+            </div>
+        </div>
+
+        <div class="chat-main">
+            <!-- Users sidebar -->
+            <div class="users-sidebar">
+                <h3>Online Users (<span id="userCount">0</span>)</h3>
+                <ul id="usersList"></ul>
+            </div>
+
+            <!-- Messages area -->
+            <div class="messages-container">
+                <div id="messages" class="messages"></div>
+                <div id="typingIndicator" class="typing-indicator"></div>
+                
+                <!-- Message input -->
+                <div class="message-input-container">
+                    <!-- File upload controls -->
+                    <div class="file-upload-area">
+                        <button class="upload-btn" id="imageBtn">📷 Photo</button>
+                        <button class="upload-btn" id="videoBtn">🎥 Video</button>
+                        <button class="upload-btn" id="voiceBtn">🎤 Voice</button>
+                        <input type="file" id="imageInput" class="hidden-file-input" accept="image/*">
+                        <input type="file" id="videoInput" class="hidden-file-input" accept="video/*">
+                        <input type="file" id="audioInput" class="hidden-file-input" accept="audio/*">
+                    </div>
+                    
+                    <div class="input-wrapper">
+                        <input type="text" id="messageInput" placeholder="Type your message..." maxlength="500">
+                        <button id="sendBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="message-counter">
+                        <span id="charCounter">0/500</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO client library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

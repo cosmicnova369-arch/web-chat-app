@@ -1,0 +1,25 @@
+🔗 YOUR PRIVATE CHAT ROOM LINK
+====================================
+
+Share this link with your girlfriend to start chatting privately:
+
+http://localhost:3000/room/mylove2024
+
+✨ Features available in your private chat:
+- 💬 Real-time messaging with message history
+- 📸 Photo sharing 
+- 🎥 Video sharing
+- 🎤 Voice messages
+- 🌙 Beautiful dark theme
+- 📱 Works on phones and computers
+
+📋 How to use:
+1. Start the server: npm start
+2. Both of you visit the link above
+3. Enter your usernames
+4. Start chatting with full media support!
+
+🔒 Privacy: This room is completely private - only people with this exact link can join.
+
+Note: Replace "localhost" with your computer's IP address if your girlfriend 
+is on a different device/network. Example: http://192.168.1.100:3000/room/mylove2024
