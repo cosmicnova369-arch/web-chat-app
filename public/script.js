@@ -350,16 +350,22 @@ function displayMessage(data, type = 'message') {
             mediaContent = `<div class="media-message"><audio src="${data.file_url}" controls></audio></div>`;
         }
         
+        const deleteButton = isOwnMessage ? `<button class="delete-btn" onclick="deleteMessage(${data.id || Date.now()})" title="Delete message">🗑️</button>` : '';
+        
         messageEl.innerHTML = `
             <div class="message-header">
                 <span class="username">${escapeHtml(data.username)}</span>
                 <span class="timestamp">${formatTimestamp(data.timestamp)}</span>
+                ${deleteButton}
             </div>
             <div class="message-content">
                 ${data.message ? escapeHtml(data.message) : ''}
                 ${mediaContent}
             </div>
         `;
+        
+        // Store message ID for deletion
+        messageEl.dataset.messageId = data.id || Date.now();
     }
     
     messages.appendChild(messageEl);
@@ -472,6 +478,20 @@ socket.on('typing', (data) => {
     }
     updateTypingIndicator();
 });
+
+socket.on('message deleted', (data) => {
+    const messageEl = document.querySelector(`[data-message-id="${data.messageId}"]`);
+    if (messageEl) {
+        messageEl.remove();
+    }
+});
+
+// Delete message function
+function deleteMessage(messageId) {
+    if (confirm('Are you sure you want to delete this message?')) {
+        socket.emit('delete message', { messageId });
+    }
+}
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);

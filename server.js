@@ -9,9 +9,15 @@ const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -195,6 +201,42 @@ io.on('connection', (socket) => {
         });
     });
     
+    socket.on('delete message', (data) => {
+        if (!socket.currentRoom || !socket.currentUsername) return;
+        
+        const { messageId } = data;
+        
+        // Verify message ownership before deletion
+        db.get(
+            `SELECT username FROM messages WHERE id = ? AND room_id = ?`,
+            [messageId, socket.currentRoom],
+            (err, row) => {
+                if (err) {
+                    console.error('Error checking message ownership:', err);
+                    return;
+                }
+                
+                // Only allow deletion if user owns the message
+                if (row && row.username === socket.currentUsername) {
+                    // Delete from database
+                    db.run(
+                        `DELETE FROM messages WHERE id = ? AND room_id = ?`,
+                        [messageId, socket.currentRoom],
+                        (err) => {
+                            if (!err) {
+                                // Broadcast deletion to all users in room
+                                io.to(socket.currentRoom).emit('message deleted', {
+                                    messageId: messageId,
+                                    deletedBy: socket.currentUsername
+                                });
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    });
+    
     socket.on('disconnect', () => {
         if (socket.currentRoom && socket.currentUsername && roomUsers[socket.currentRoom]) {
             // Remove user from room
@@ -213,8 +255,36 @@ io.on('connection', (socket) => {
     });
 });
 
+// Error handling
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+    console.log('\nShutting down server...');
+    db.close((err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            console.log('Database connection closed.');
+        }
+    });
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
+
 // Start server
 server.listen(PORT, () => {
     console.log(`Chat server running on http://localhost:${PORT}`);
     console.log(`Create a private room by visiting: http://localhost:${PORT}/room/YOUR_ROOM_ID`);
+    console.log('Press Ctrl+C to stop the server');
 });
