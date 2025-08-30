@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: private-chat-room
+    name: web-chat-app
     env: node
     plan: free
     buildCommand: npm install
